@@ -4,10 +4,12 @@ require("../connect")
 const cartSchema=mongoose.Schema({
     userId:{
         type:mongoose.Schema.ObjectId,
+        ref:"user",
         required:true
     },
     productId:{
         type:mongoose.Schema.ObjectId,
+        ref:"products",
         required:true
     },
     qty:{
@@ -15,6 +17,11 @@ const cartSchema=mongoose.Schema({
         min:1,
         default:1,
         required:true
+    },
+    checkout:{
+        type:Boolean,
+        require:true,
+        default:false
     }
 })
 

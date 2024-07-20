@@ -1,5 +1,6 @@
 const cartModel=require("../database/models/cart")
-const productsModel=require("../database/models/products")
+const productsModel=require("../database/models/products");
+const { checkout } = require("../route/product");
 
 const addcart=async(req,res)=>{
     try{
@@ -8,6 +9,27 @@ const addcart=async(req,res)=>{
         {
             res.status(400);
             res.json({message:"no such product"});
+            return;
+        }
+        if(data.stock<req.body.qty)
+        {
+            res.status(400);
+            res.json({message:"insufficient qyantity"});
+            return;
+        }
+        let addcartdata=await cartModel.findOne({userId:req.userId,productId:req.body.productId,checkout:false});
+        if(data.stock<(addcartdata.qty+req.body.qty))
+        {
+            res.status(400);
+            res.json({message:"insufficient qyantity"});
+            return;
+        }
+        if(addcartdata)
+        {
+            let qty=(addcartdata.qty+Number(req.body.qty));
+            await cartModel.updateOne({_id:addcartdata._id},{$set:{qty:qty}})
+            res.status(200)
+            res.json({message:"product added into the cart"});
             return;
         }
         let cart=new cartModel({productId:req.body.productId,userId:req.userId,qty:req.body.qty})
@@ -26,7 +48,7 @@ const addcart=async(req,res)=>{
 
 const deletecart=async(req,res)=>{
     try{
-        let data=await cartModel.findOne({productId:req.body.productId,userId:req.userId});
+        let data=await cartModel.findOne({productId:req.body.productId,userId:req.userId,checkout:false});
         if(!data)
         {
             res.status(400);
@@ -48,7 +70,7 @@ const deletecart=async(req,res)=>{
 
 const viewcart=async(req,res)=>{
     try{
-        let data=await cartModel.find({userId:req.userId});
+        let data=await cartModel.find({userId:req.userId,checkout:false});
         if(!data.length)
         {
             res.status(400);
@@ -69,7 +91,6 @@ const viewcart=async(req,res)=>{
     }
     catch(err)
     {
-        console.log(err);
         res.status(500)
         res.json({message:"server error"});
         return;

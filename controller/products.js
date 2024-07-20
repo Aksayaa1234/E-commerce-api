@@ -131,6 +131,12 @@ const viewproductsprice=async(req,res)=>{
 
 const deleteproduct=async(req,res)=>{
     try{
+        if(!req.admin)
+        {
+            res.status(400);
+            res.json({message:"invalid access"});
+            return;
+        }
         let data=await productsModel.findOne({_id:req.body.productId});
         if(!data)
         {
