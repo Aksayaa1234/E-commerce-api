@@ -1,14 +1,10 @@
 require ("dotenv").config();
 const express=require ("express");
-const loginCont=require ("./controller/login");
 const {auth}=require ("./middleware/auth");
 const cookieParser = require("cookie-parser");
-const product=require("./route/product");
-const category=require("./route/category");
-const cart=require("./route/cart");
-const payment=require("./route/payment");
+const api=require("./route/api");
 const userCont=require("./controller/user");
-const user=require("./route/user");
+
 
 const app=express();
 const PORT=process.env.PORT;
@@ -16,14 +12,9 @@ const PORT=process.env.PORT;
 app.use(express.urlencoded({extended:true}));
 app.use(express.json());
 app.use(cookieParser());
-app.use("/product",product);
-app.use("/category",category);
-app.use("/cart",cart);
-app.use("/payment",payment);
-app.use("/user",user);
+app.use("/api",api);
 
-app.post("/signup",loginCont.signup)
-app.post("/login",loginCont.login)
+
 app.get("/health_check",userCont.health_check);
 // app.get("/product",auth,productsCont.viewallproducts)
 // app.post("/product/add",auth,productsCont.addproduct)
